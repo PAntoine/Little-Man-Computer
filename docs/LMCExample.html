@@ -1,0 +1,763 @@
+<!DOCTYPE HTML PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html xmlns="http://www.w3.org/TR/REC-html40" xmlns:st1="urn:schemas-microsoft-com:office:smarttags" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml"><head>
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word 10">
+<meta name="Originator" content="Microsoft Word 10">
+<link rel="File-List" href="http://www.atkinson.yorku.ca/%7Esychen/research/LMC/LMCExample_files/filelist.xml">
+<link rel="Edit-Time-Data" href="http://www.atkinson.yorku.ca/%7Esychen/research/LMC/LMCExample_files/editdata.mso">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]-->
+<title>LMC Sample Program</title>
+<o:smarttagtype namespaceuri="urn:schemas-microsoft-com:office:smarttags" name="place"></o:smarttagtype>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>sychen</o:Author>
+  <o:LastAuthor>sychen</o:LastAuthor>
+  <o:Revision>15</o:Revision>
+  <o:TotalTime>23</o:TotalTime>
+  <o:Created>2004-05-14T18:12:00Z</o:Created>
+  <o:LastSaved>2004-05-14T18:37:00Z</o:LastSaved>
+  <o:Pages>1</o:Pages>
+  <o:Words>600</o:Words>
+  <o:Characters>3422</o:Characters>
+  <o:Company>Atkinson</o:Company>
+  <o:Lines>28</o:Lines>
+  <o:Paragraphs>8</o:Paragraphs>
+  <o:CharactersWithSpaces>4014</o:CharactersWithSpaces>
+  <o:Version>10.2625</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:GrammarState>Clean</w:GrammarState>
+  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
+ </w:WordDocument>
+</xml><![endif]--><!--[if !mso]><object
+ classid="clsid:38481807-CA0E-42D2-BF39-B33AF135CC4D" id=ieooui></object>
+<style>
+st1\:*{behavior:url(#ieooui) }
+</style>
+<![endif]-->
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	color:black;}
+h1
+	{mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	mso-pagination:widow-orphan;
+	mso-outline-level:1;
+	font-size:24.0pt;
+	font-family:"Times New Roman";
+	color:black;}
+h4
+	{mso-margin-top-alt:auto;
+	margin-right:0cm;
+	mso-margin-bottom-alt:auto;
+	margin-left:0cm;
+	mso-pagination:widow-orphan;
+	mso-outline-level:4;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	color:black;}
+p.MsoBodyText2, li.MsoBodyText2, div.MsoBodyText2
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:center;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-ansi-language:EN-CA;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	mso-text-animation:none;
+	text-decoration:none;
+	text-underline:none;
+	text-decoration:none;
+	text-line-through:none;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:fuchsia;
+	mso-text-animation:none;
+	text-decoration:none;
+	text-underline:none;
+	text-decoration:none;
+	text-line-through:none;}
+tt
+	{font-family:"Courier New";
+	mso-ascii-font-family:"Courier New";
+	mso-fareast-font-family:"Times New Roman";
+	mso-hansi-font-family:"Courier New";
+	mso-bidi-font-family:"Courier New";}
+span.GramE
+	{mso-style-name:"";
+	mso-gram-e:yes;}
+@page Section1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;
+	mso-header-margin:35.4pt;
+	mso-footer-margin:35.4pt;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+ @list l0
+	{mso-list-id:102190558;
+	mso-list-template-ids:413823070;}
+@list l1
+	{mso-list-id:340397024;
+	mso-list-template-ids:-1554904212;}
+@list l1:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:72.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;
+	mso-ansi-font-size:10.0pt;
+	font-family:"Courier New";
+	mso-bidi-font-family:"Times New Roman";}
+@list l2
+	{mso-list-id:816844233;
+	mso-list-template-ids:459317614;}
+@list l2:level1
+	{mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level2
+	{mso-level-tab-stop:72.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level3
+	{mso-level-tab-stop:108.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level4
+	{mso-level-tab-stop:144.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level5
+	{mso-level-tab-stop:180.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level6
+	{mso-level-tab-stop:216.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level7
+	{mso-level-tab-stop:252.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level8
+	{mso-level-tab-stop:288.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l2:level9
+	{mso-level-tab-stop:324.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l3
+	{mso-list-id:1368604831;
+	mso-list-template-ids:-1808757270;}
+@list l3:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:72.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;
+	mso-ansi-font-size:10.0pt;
+	font-family:"Courier New";
+	mso-bidi-font-family:"Times New Roman";}
+@list l3:level3
+	{mso-level-tab-stop:108.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l3:level4
+	{mso-level-tab-stop:144.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l3:level5
+	{mso-level-tab-stop:180.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l3:level6
+	{mso-level-tab-stop:216.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l3:level7
+	{mso-level-tab-stop:252.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l3:level8
+	{mso-level-tab-stop:288.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+@list l3:level9
+	{mso-level-tab-stop:324.0pt;
+	mso-level-number-position:left;
+	text-indent:-18.0pt;}
+ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+<!--[if gte mso 10]>
+<style>
+ /* Style Definitions */
+ table.MsoNormalTable
+	{mso-style-name:"Table Normal";
+	mso-tstyle-rowband-size:0;
+	mso-tstyle-colband-size:0;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-padding-alt:0cm 5.4pt 0cm 5.4pt;
+	mso-para-margin:0cm;
+	mso-para-margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";}
+</style>
+<![endif]--><!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="3074"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1"/>
+  <o:regrouptable v:ext="edit">
+   <o:entry new="1" old="0"/>
+  </o:regrouptable>
+ </o:shapelayout></xml><![endif]-->
+</head><body style="" lang="EN-US" link="blue" vlink="fuchsia" bgcolor="#f1f1f1">
+
+<div class="Section1">
+
+<h1 style="text-align: center;" align="center">LMC Sample Program</h1>
+
+<p class="MsoNormal" style=""><span style="" lang="EN-CA">The triangular numbers are as
+follows: &nbsp;&nbsp;</span></p>
+
+<p class="MsoNormal" style="margin-left: 30pt;"><tt><span style="font-size: 10pt;" lang="EN-CA">&nbsp;<span class="GramE">1&nbsp;&nbsp;&nbsp;&nbsp; =&nbsp;&nbsp;&nbsp; 1<br>
+&nbsp;3 &nbsp;&nbsp;&nbsp; =&nbsp;&nbsp;&nbsp; 1 + 2<span style="font-size: 12pt; font-family: &quot;Times New Roman&quot;;" lang="EN-US"><br>
+</span>&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp; =&nbsp;&nbsp;&nbsp; 1 + 2 + 3<span style="font-size: 12pt; font-family: &quot;Times New Roman&quot;;" lang="EN-US"><br>
+</span>&nbsp;10&nbsp;&nbsp;&nbsp; =&nbsp;&nbsp;&nbsp; 1 + 2 + 3 + 4<br>
+&nbsp;15&nbsp;&nbsp;&nbsp; =&nbsp;&nbsp;&nbsp; 1 + 2 + 3 + 4 + 5<span style="font-size: 12pt; font-family: &quot;Times New Roman&quot;;"><br>
+</span>&nbsp;21&nbsp;&nbsp;&nbsp; =&nbsp;&nbsp;&nbsp; 1 + 2 + 3 + 4 + 5 + 6<u1:p></u1:p><br>
+&nbsp;etc.<u1:p></u1:p></span></span></tt></p>
+
+<p class="MsoNormal" style=""><span style="" lang="EN-CA">The series begins with 1 (the first
+triangular number).&nbsp; To calculate the n<sup>th</sup> triangular number, n
+is added to the previous triangular number.&nbsp; For example, the fourth
+triangular number is calculated by adding 4 to the third triangular number
+(which is 6), i.e. 10 = (1 + 2 + 3) + 4. </span></p>
+
+<p class="MsoNormal"><span style="" lang="EN-CA">Write a
+program that takes a single value (greater or equal to zero) as input and
+outputs which triangular number it is or 0 if it is not a trinangular
+number.&nbsp; For example, if the input is 15, the output will be 5 (15 is the
+5<sup>th</sup> triangular number); and if the input is 7, the output will be 0
+(7 is not a triangular number).</span></p>
+
+<h4>Flowchart</h4>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;">The flowchart for the above
+program is shown below.</p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><!--[if gte vml 1]><v:group
+ id="_x0000_s1116" style='position:absolute;margin-left:95.25pt;margin-top:14.25pt;
+ width:477.75pt;height:594pt;z-index:1' coordorigin="2055,6675" coordsize="9555,11880">
+ <v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202" path="m,l,21600r21600,l21600,xe">
+  <v:stroke joinstyle="miter"/>
+  <v:path gradientshapeok="t" o:connecttype="rect"/>
+ </v:shapetype><v:shape id="_x0000_s1069" type="#_x0000_t202" style='position:absolute;
+  left:4935;top:12795;width:450;height:540' o:regroupid="2" stroked="f">
+  <v:textbox style='mso-next-textbox:#_x0000_s1069' inset="0,0,0,0">
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal style='background:#F1F1F1'><span class=GramE>yes</span></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:shapetype id="_x0000_t116" coordsize="21600,21600" o:spt="116"
+  path="m3475,qx,10800,3475,21600l18125,21600qx21600,10800,18125,xe">
+  <v:stroke joinstyle="miter"/>
+  <v:path gradientshapeok="t" o:connecttype="rect" textboxrect="1018,3163,20582,18437"/>
+ </v:shapetype><v:shape id="_x0000_s1070" type="#_x0000_t116" style='position:absolute;
+  left:3150;top:6675;width:1080;height:540' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1070'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='text-align:center'>Start</p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1071" style='position:absolute' from="3690,7215"
+  to="3690,7575" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:shapetype id="_x0000_t109" coordsize="21600,21600" o:spt="109"
+  path="m,l,21600r21600,l21600,xe">
+  <v:stroke joinstyle="miter"/>
+  <v:path gradientshapeok="t" o:connecttype="rect"/>
+ </v:shapetype><v:shape id="_x0000_s1072" type="#_x0000_t109" style='position:absolute;
+  left:2250;top:7575;width:2880;height:720' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1072'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='margin-top:6.0pt;text-align:center'><span
+     class=GramE>input</span> VALUE</p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1073" style='position:absolute' from="3690,8295"
+  to="3690,8835" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:shape id="_x0000_s1074" type="#_x0000_t109" style='position:absolute;
+  left:2250;top:8835;width:2880;height:720' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1074'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='margin-top:6.0pt;text-align:center'><span
+     class=GramE>init</span> TRINUM</p>
+     <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:shape id="_x0000_s1075" type="#_x0000_t109" style='position:absolute;
+  left:5490;top:12255;width:2340;height:720' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1075'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='margin-top:6.0pt;text-align:center'><span
+     class=GramE>increment</span> N</p>
+     <p class=MsoNormal align=center style='margin-top:6.0pt;text-align:center'><o:p>&nbsp;</o:p></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1076" style='position:absolute' from="3690,10815"
+  to="3690,11895" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:shape id="_x0000_s1077" type="#_x0000_t109" style='position:absolute;
+  left:2250;top:16215;width:2880;height:720' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1077'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='margin-top:6.0pt;text-align:center'><span
+     class=GramE>output</span> ZERO</p>
+     <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1078" style='position:absolute' from="3690,16935"
+  to="3690,18015" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:shape id="_x0000_s1079" type="#_x0000_t116" style='position:absolute;
+  left:3150;top:18015;width:1080;height:540' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1079'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='text-align:center'>End</p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1080" style='position:absolute' from="5205,12616"
+  to="5490,12617" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:line id="_x0000_s1081" style='position:absolute' from="3690,9555"
+  to="3690,10095" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:shape id="_x0000_s1082" type="#_x0000_t109" style='position:absolute;
+  left:2250;top:10095;width:2880;height:720' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1082'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='margin-top:6.0pt;text-align:center'><span
+     class=GramE>init</span> N</p>
+     <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:shape id="_x0000_s1083" type="#_x0000_t109" style='position:absolute;
+  left:8550;top:12255;width:2340;height:720' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1083'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='margin-top:6.0pt;text-align:center'><span
+     class=GramE>update</span> TRINUM</p>
+     <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1084" style='position:absolute' from="7830,12615"
+  to="8550,12615" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:line id="_x0000_s1085" style='position:absolute' from="10890,12615"
+  to="11610,12615" o:regroupid="2"/>
+ <v:line id="_x0000_s1086" style='position:absolute;flip:y' from="11610,11355"
+  to="11610,12615" o:regroupid="2"/>
+ <v:line id="_x0000_s1087" style='position:absolute;flip:x' from="3690,11355"
+  to="11610,11355" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:shape id="_x0000_s1089" type="#_x0000_t202" style='position:absolute;
+  left:5205;top:14854;width:525;height:416' o:regroupid="2" stroked="f">
+  <v:textbox style='mso-next-textbox:#_x0000_s1089' inset="0,0,0,0">
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal style='background:#F1F1F1'><span class=GramE>yes</span></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1090" style='position:absolute' from="3690,13335"
+  to="3690,14055" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:line id="_x0000_s1091" style='position:absolute' from="5295,14775"
+  to="6030,14775" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:line id="_x0000_s1092" style='position:absolute' from="3690,15495"
+  to="3690,16215" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:shape id="_x0000_s1093" type="#_x0000_t109" style='position:absolute;
+  left:6030;top:14415;width:2880;height:720' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1093'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal align=center style='margin-top:6.0pt;text-align:center'><span
+     class=GramE>output</span> N</p>
+     <p class=MsoNormal><o:p>&nbsp;</o:p></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:line id="_x0000_s1094" style='position:absolute' from="8910,14775"
+  to="10170,14775" o:regroupid="2"/>
+ <v:line id="_x0000_s1095" style='position:absolute' from="10170,14775" to="10170,17475"
+  o:regroupid="2"/>
+ <v:line id="_x0000_s1096" style='position:absolute;flip:x y' from="3690,17475"
+  to="10170,17475" o:regroupid="2">
+  <v:stroke endarrow="open"/>
+ </v:line><v:shapetype id="_x0000_t110" coordsize="21600,21600" o:spt="110"
+  path="m10800,l,10800,10800,21600,21600,10800xe">
+  <v:stroke joinstyle="miter"/>
+  <v:path gradientshapeok="t" o:connecttype="rect" textboxrect="5400,5400,16200,16200"/>
+ </v:shapetype><v:shape id="_x0000_s1097" type="#_x0000_t110" style='position:absolute;
+  left:2145;top:11896;width:3060;height:1440' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1097'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal><span lang=EN-CA style='mso-ansi-language:EN-CA'>VALUE
+     &gt; <span class=GramE>TRINUM ?</span><o:p></o:p></span></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:shape id="_x0000_s1110" type="#_x0000_t202" style='position:absolute;
+  left:3870;top:15496;width:720;height:540' o:regroupid="2" stroked="f">
+  <v:textbox style='mso-next-textbox:#_x0000_s1110' inset="0,0,0,0">
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal style='background:#F1F1F1'><span class=GramE><span
+     lang=EN-CA style='mso-ansi-language:EN-CA'>no</span></span><span
+     lang=EN-CA style='mso-ansi-language:EN-CA'><o:p></o:p></span></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:shape id="_x0000_s1111" type="#_x0000_t202" style='position:absolute;
+  left:3870;top:13336;width:720;height:540' o:regroupid="2" stroked="f">
+  <v:textbox style='mso-next-textbox:#_x0000_s1111' inset="0,0,0,0">
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal style='background:#F1F1F1'><span class=GramE><span
+     lang=EN-CA style='mso-ansi-language:EN-CA'>no</span></span><span
+     lang=EN-CA style='mso-ansi-language:EN-CA'><o:p></o:p></span></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape><v:shape id="_x0000_s1113" type="#_x0000_t110" style='position:absolute;
+  left:2055;top:14057;width:3240;height:1440' o:regroupid="2">
+  <v:textbox style='mso-next-textbox:#_x0000_s1113'>
+   <![if !mso]>
+   <table cellpadding=0 cellspacing=0 width="100%">
+    <tr>
+     <td><![endif]>
+     <div>
+     <p class=MsoNormal><span lang=EN-CA style='mso-ansi-language:EN-CA'>VALUE
+     == <span class=GramE>TRINUM ?</span><o:p></o:p></span></p>
+     </div>
+     <![if !mso]></td>
+    </tr>
+   </table>
+   <![endif]></v:textbox>
+ </v:shape></v:group><![endif]--><!--[if !vml]--><span style="">
+
+<table align="left" cellpadding="0" cellspacing="0">
+ <tbody><tr>
+  <td height="18" width="125"></td>
+ </tr>
+ <tr>
+  <td></td>
+  <td><img src="LMCExample_files/image001.gif" v:shapes="_x0000_s1116 _x0000_s1069 _x0000_s1070 _x0000_s1071 _x0000_s1072 _x0000_s1073 _x0000_s1074 _x0000_s1075 _x0000_s1076 _x0000_s1077 _x0000_s1078 _x0000_s1079 _x0000_s1080 _x0000_s1081 _x0000_s1082 _x0000_s1083 _x0000_s1084 _x0000_s1085 _x0000_s1086 _x0000_s1087 _x0000_s1089 _x0000_s1090 _x0000_s1091 _x0000_s1092 _x0000_s1093 _x0000_s1094 _x0000_s1095 _x0000_s1096 _x0000_s1097 _x0000_s1110 _x0000_s1111 _x0000_s1113" height="798" width="642"></td>
+ </tr>
+</tbody></table>
+
+</span><!--[endif]--><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<p class="MsoNormal" style="margin-bottom: 12pt;"><o:p>&nbsp;</o:p></p>
+
+<br style="" clear="ALL">
+
+<h4>Program</h4>
+
+<p class="MsoNormal">INP <br>
+STA VALUE <br>
+LDA ZERO<br>
+STA TRINUM <br>
+STA N<br>
+LOOP LDA TRINUM<br>
+SUB VALUE<br>
+BRP ENDLOOP<br>
+LDA N<br>
+ADD ONE<br>
+STA N<br>
+ADD TRINUM<br>
+STA TRINUM<br>
+BRA LOOP<br>
+ENDLOOP LDA VALUE<br>
+SUB TRINUM<br>
+BRZ EQUAL<br>
+LDA ZERO<br>
+OUT<br>
+BRA DONE<br>
+EQUAL LDA N<br>
+OUT<br>
+DONE HLT<br>
+VALUE DAT 000<br>
+TRINUM DAT 000<br>
+N DAT 000<br>
+ZERO DAT 000<br>
+ONE DAT 001</p>
+
+<h4>What you should do</h4>
+
+<ol start="1" type="1">
+ <li class="MsoNormal" style="">Click on the "LMC
+     Simulator Applet" link to start the LMC simulator.</li>
+ <li class="MsoNormal" style="">Clear the Message Box and all
+     of the LMC mailboxes -- click the "Clear Messages" button and
+     the "Clear" button if necessary.</li>
+ <li class="MsoNormal" style="">Copy the twenty eight line
+     program above and paste it into the Message Box</li>
+ <li class="MsoNormal" style="">Click on the "Compile
+     Program" button.</li>
+ <li class="MsoNormal" style="">Click on the
+     "Run" button.</li>
+ <li class="MsoNormal" style="">When prompted, enter
+     three-digit numbers in the "In-Box", and press the
+     "Enter" button.</li>
+</ol>
+
+<h4>What you should see</h4>
+
+<ul type="disc">
+ <li class="MsoNormal" style="">After the program is
+     compiled, you should see from mailbox 0 to 23 the instructions 901, 323,
+     526, 324, 325, 524, 223, 814, 525, 127, 325, 124, 324, 605, 523, 224, 720,
+     526, 902, 622, 525, 902.&nbsp; The Program Counter should start at 0
+     (click on "Reset" if necessary).</li>
+ <li class="MsoNormal" style="">DAT reserves mailbox 23 for
+     N (the user input), mailbox 24 for TRINUM (the value of the current
+     triangular number), <span class="GramE">mailbox</span> 25 for COUNT (the
+     number of triangular numbers that have been calculated), mailbox 26 for
+     ZERO, and mailbox 27 for ONE.&nbsp; </li>
+ <li class="MsoNormal" style="">When you click on
+     "Run" or "Step", the Message Box will describe the
+     actions of each instruction.</li>
+ <li class="MsoNormal" style="">The first two instructions
+     accept the input VALUE from the user.</li>
+ <li class="MsoNormal" style="">The next three instructions
+     initialize the values of TRINUM and N to ZERO.</li>
+ <li class="MsoNormal" style="">The algorithm is as
+     follows: calculate triangular numbers until the calculated triangular
+     number is greater than or equal to the input value.&nbsp; If the
+     triangular number is equal to the input, then output N.&nbsp; Otherwise,
+     output ZERO.</li>
+ <li class="MsoNormal" style="">The <st1:place>LOOP</st1:place>
+     starts by checking this exit condition.&nbsp; The input VALUE is
+     subtracted from TRINUM.&nbsp; As long as the result is negative, the LMC
+     stays in the loop (i.e. the BRP does nothing) to calculate more triangular
+     numbers.</li>
+ <ul type="circle">
+  <li class="MsoNormal" style="">To calculate the next
+      triangular number, N is incremented by ONE, and this new value of N is
+      added to TRINUM.&nbsp; Remember, <span style="" lang="EN-CA">the n<sup>th</sup> triangular number is calculated by adding n to
+      the previous triangular number.</span></li>
+  <li class="MsoNormal" style=""><span style="" lang="EN-CA">The BRA LOOP indicates the end of the
+      loop body.&nbsp; This BRANCH command causes the execution of the LMC to
+      "jump" back to the start of the loop.</span></li>
+ </ul>
+ <li class="MsoNormal" style="">After exiting the <st1:place>LOOP</st1:place>,
+     the value of TRINUM is greater than or equal to the input VALUE -- the LMC
+     has calculated enough triangular numbers to determine if the user input is
+     one.</li>
+ <li class="MsoNormal" style="">The SUB instruction is to
+     check if TRINUM and VALUE are equal.</li>
+ <ul type="circle">
+  <li class="MsoNormal" style="">If they are equal,
+      subtracting TRINUM from VALUE will equal 000.&nbsp; BRZ will allow the
+      LMC to skip past the code section that handles when these two values are
+      not equal.&nbsp; The LMC will then execute the code segment that outputs
+      N to the Out-Box -- the input VALUE is the Nth triangular number.</li>
+  <li class="MsoNormal" style="">If they are not
+      equal, the result on the Accumulator will not be 000, and BRZ will do
+      nothing.&nbsp; The code after of the BRZ instruction is executed.&nbsp;
+      This code outputs ZERO to the Out-Box, and then skips past the code for
+      the two values being EQUAL to the end of the program.</li>
+ </ul>
+</ul>
+
+</div>
+
+</body></html>

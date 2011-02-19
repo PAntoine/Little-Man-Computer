@@ -1,0 +1,103 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.79 [en] (Windows NT 5.0; U) [Netscape]">
+   <title>LMC Instruction Set</title>
+<style type="text/css">
+  <!--
+       A:link {text-decoration: none;}
+       A:visited {text-decoration: none;}
+  -->
+  </style>
+</head>
+<body text="#000000" bgcolor="#F1F1F1" link="#0000FF" vlink="#FF00FF">
+
+<h1 style="text-align: center;">
+LMC Instruction Set</h1>
+The LMC has nine instructions.&nbsp; Each instruction has an assembly mnemonic
+that is equivalent to a three-digit (decimal) instruction.&nbsp; In this
+numerical instruction, the first digit usually represents the instruction,
+and the second and third digits usually represent a mailbox address.
+<p><a href="LMCInstructionSummary.html">Summary Table</a>
+<h4>
+LOAD</h4>
+mnemonic - LDA
+<br>numerical/machine code - 5
+<p>Load the contents of the given mailbox onto the accumulator (calculator).&nbsp;
+Note: the contents of the mailbox are not changed.
+<h4>
+STORE</h4>
+mnemonic - STA
+<br>numerical/machine code - 3
+<p>Store the contents of the accumulator (calculator) to the mailbox of
+the given address.&nbsp; Note: the contents of the accumulator are not
+changed.
+<h4>
+ADD</h4>
+mnemonic - ADD
+<br>numerical/machine code - 1
+<p>Add the contents of the given mailbox onto the accumulator (calculator).&nbsp;
+Note: the contents of the mailbox are not changed, and the actions of the
+accumulator are not defined for add instructions that cause sums larger
+than 3 digits.
+<h4>
+SUBTRACT</h4>
+mnemonic - SUB
+<br>numerical/machine code - 2
+<p>Subtract the contents of the given mailbox from the accumulator (calculator).&nbsp;
+Note: the contents of the mailbox are not changed, and the actions of the
+accumulator are not defined for subtract instructions that cause negative
+results -- however, a negative flag will be set so that BRP can be used
+properly (see below).
+<h4>
+INPUT</h4>
+mnemonic - INP
+<br>numerical/machine code - 901
+<p>Copy the value from the "in box" onto the accumulator (calculator).
+<h4>
+OUTPUT</h4>
+mnemonic - OUT
+<br>numerical/machine code - 902
+<p>Copy the value from the accumulator (calculator) to the "out box".&nbsp;
+Note: the contents of the accumulator are not changed.
+<h4>
+END</h4>
+mnemonic - HLT
+<br>numerical/machine code - 000
+<p>Causes the Little Man Computer to stop executing your program.
+<h4>
+BRANCH IF ZERO</h4>
+mnemonic - BRZ
+<br>numerical/machine code - 7
+<p>If the contents of the accumulator (calculator) are 000, the PC (program
+counter) will be set to the given address.&nbsp; Note: since the program
+is stored in memory, data and program instructions all have the same address/location
+format.
+<h4>
+BRANCH IF ZERO OR POSITIVE</h4>
+mnemonic - BRP
+<br>numerical/machine code - 8
+<p>If the contents of the accumulator (calculator) are 000 or positive
+(i.e. the negative flag is not set), the PC (program counter) will be set
+to the given address.&nbsp; Note: since the program is stored in memory,
+data and program instructions all have the same address/location format.
+<h4>
+BRANCH ALWAYS</h4>
+mnemonic - BRA
+<br>numerical/machine code - 6
+<p>Set the contents of the accumulator (calculator) to the given address.&nbsp;
+Note: since the program is stored in memory, data and program instructions
+all have the same address/location format.
+<h4>
+DATA LOCATION</h4>
+mnemonic - DAT
+<br>numerical/machine code - (the data)
+<p>When compiled, a program converts each instruction into a three-digit
+code.&nbsp; These codes are placed in sequential mailboxes.&nbsp; Instead
+of a program component, this instruction will reserve the next mailbox
+for data storage.
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>
