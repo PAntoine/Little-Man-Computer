@@ -1,7 +1,6 @@
 /*-------------------------------------------------------------------------------------*
  *
  * name:  lmc_as.h
- * proj:  Miniweb browser version 3
  *
  * desc:  This file holds the definitions for the Little Man Computer compiler.
  *     
@@ -48,8 +47,6 @@
  * auth:  Peter Antoine  
  * date:  16/02/11
  *
- *               Copyright (c) 2009 Miniweb Interactive.
- *                       All rights Reserved.
  *-------------------------------------------------------------------------------------*/
 #ifndef  __LMC_AS_H__
 #define  __LMC_AS_H__

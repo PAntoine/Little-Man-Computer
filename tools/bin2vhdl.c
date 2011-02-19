@@ -1,18 +1,3 @@
-/*-------------------------------------------------------------------------------------*
- *
- * name:  bin2vhdl.c
- * proj:  Miniweb browser version 3
- *
- * desc:  This function will generate a VHDL rom file with the contents of the 
- *        file passed in, in it.
- *
- * auth:  Peter Antoine  
- * date:  18/02/11
- *
- *               Copyright (c) 2009 Miniweb Interactive.
- *                       All rights Reserved.
- *-------------------------------------------------------------------------------------*/
-
 #include <stdlib.h>
 #include <stdio.h>
 
