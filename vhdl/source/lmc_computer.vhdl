@@ -65,7 +65,6 @@ architecture rtl of LMC_SOC is
 				wr		: out	std_logic;									--- read/write line
 				as		: out	std_logic;									--- address strobe
 				io		: out	std_logic;									--- IO port enable
-				io_wr	: out	std_logic;									--- direction of the io
 				address	: out	std_logic_vector(ADDR_WIDTH-1 downto 0);	---	address lines
 				data	: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- data lines
 				io_port	: inout	std_logic_vector(DATA_WIDTH-1 downto 0)		--- input/output port
@@ -82,7 +81,6 @@ architecture rtl of LMC_SOC is
 	signal as_wire		: std_logic;
 	signal rw_wire		: std_logic;
 	signal rom_sel		: std_logic;
-	signal io_rw_wire	: std_logic;
 	signal addr_bus		: std_logic_vector (ADDR_WIDTH-1 downto 0);
 	signal data_bus		: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal io_port_bus	: std_logic_vector (DATA_WIDTH-1 downto 0);
@@ -99,9 +97,9 @@ begin
 	rom_sel <= '1' when (as_wire = '1' and rw_wire = RW_READ) else '0';
 
 	romc:	ROM port map (sel => as_wire, address => addr_bus, data => data_bus);
-	iocont:	IO	port map (wr => io_wr_wire, data => io_port_bus);
+--	iocont:	IO	port map (wr => io_wr_wire, data => io_port_bus);
 	ramc:	RAM port map (sel => as_wire, rw => rw_write, address => addr_bus, data => data_bus);
-	lc: 	LMC port map (reset => reset, enable => enable, clock => clock, wr => rw_wire, as => as_wire, address => addr_bus, data => data_bus, io_wr => io_wr_wire, io_port => io_port_bus);
+	lc: 	LMC port map (reset => reset, enable => enable, clock => clock, wr => rw_wire, as => as_wire, address => addr_bus, data => data_bus, io_port => io_port_bus);
 
 end architecture rtl;
 

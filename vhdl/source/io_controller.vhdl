@@ -6,6 +6,13 @@
 --- Desc:
 ---       Little Man Computer
 ---	
+---		This block contains the IO controller for the LMC.
+---
+---		It has a the responsibility for handling the ROM any other external
+---		devices that can be attached.
+---
+---		It works on a port basis, the device decides what to do on the value
+---		that was last written to the port.
 ---
 --- Errors:
 ---       None.

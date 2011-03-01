@@ -54,7 +54,6 @@ entity LMC is
 			wr		: out	std_logic;									--- read/write line
 			as		: out	std_logic;									--- address strobe
 			io		: out	std_logic;									--- IO port enable
-			io_wr	: out	std_logic;									--- direction of the io
 			address	: out	std_logic_vector(ADDR_WIDTH-1 downto 0);	---	address lines
 			data	: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- data lines
 			io_port	: inout	std_logic_vector(DATA_WIDTH-1 downto 0)		--- input/output port
@@ -75,7 +74,6 @@ architecture rtl of LMC is
 	signal int_clock	: std_logic;
 	signal bus_clock	: std_logic;
 	signal alu_clock	: std_logic;
-	signal io_clock		: std_logic;
 		
 	------------------------------------------------------------
 	--- internal registers/buffers/wires
@@ -144,7 +142,9 @@ begin
 	--- bus controller
 	------------------------------------------------------------
 	--- handle rising edge
-	bus_clock <= '1' when (int_clock = '1' and (load = '1' or store = '1'  or fetch = '1')) else '0';
+	bus_clock <= '1' when (int_clock = '1' and (load = '1' or store = '1'  or fetch = '1' or io_load = '1' or io_store = '1')) else '0';
+	
+	io <= '1' when (io_store = '1' or io_load = '1') else '0';
 
 	process (load, fetch, store, bus_clock)
 	begin
@@ -159,7 +159,7 @@ begin
 
 		elsif (bus_clock'event and bus_clock = '1')
 		then
-			if (load = '1')
+		if (load = '1' or store = '1' or io_load = '1' or io_store = '1')
 			then
 				as		<= '1';
 				address	<= oreg;
@@ -170,10 +170,6 @@ begin
 				address	<= pc;
 				ireg	<= oreg;
 
-			elsif (store = '1')
-			then
-				as		<= '1';
-				address	<= oreg;
 			end if;
 		end if;
 	end process;
@@ -186,10 +182,11 @@ begin
 		then
 			oreg <= (others => '0');
 
-		elsif (load = '0' and store = '0' and fetch = '0')
+		elsif (load = '0' and store = '0' and fetch = '0' and io_store = '1')
 		then
 			wr		<= RW_READ;
 			data	<= (others => 'Z');
+			io_port <= (others => 'Z');
 
 		elsif (bus_clock'event and bus_clock = '0')
 		then
@@ -201,40 +198,12 @@ begin
 			then
 				wr		<= RW_WRITE;
 				data	<= acc;
-			end if;
-		end if;
-	end process;
 
-	------------------------------------------------------------
-	--- IO bus driver
-	------------------------------------------------------------
-	io_clock <= '1' when int_clock = '1' and (io_load = '1' or io_store = '1') else '0';
-	
-	process (io_load, io_store,io_clock)
-	begin
-		if (io_load = '0' and io_store = '0')
-		then
-			io_port <= (others => 'Z');
-			
-		elsif (io_clock'event and io_clock = '1')
-		then
-			if (io_store = '1')
+			elsif (io_store = '1')
 			then
 				io_port <= acc;
+
 			end if;
-		end if;
-	end process;
-
-	--- handle setting the io_wr strobe
-	process (io_store, io_clock)
-	begin
-		if (io_store = '0')
-		then
-			io_wr <= '0';
-
-		elsif (io_clock'event and io_clock = '0')
-		then
-			io_wr <= '1';
 		end if;
 	end process;
 
