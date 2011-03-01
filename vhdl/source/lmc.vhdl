@@ -44,6 +44,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 use work.definitions.all;
 
 entity LMC is
@@ -52,12 +53,11 @@ entity LMC is
 			enable	: in	std_logic;									--- enables the processor
 			wr		: out	std_logic;									--- read/write line
 			as		: out	std_logic;									--- address strobe
-			ips		: out	std_logic;									--- input latched
-			ops		: out	std_logic;									--- output latched
+			io		: out	std_logic;									--- IO port enable
+			io_wr	: out	std_logic;									--- direction of the io
 			address	: out	std_logic_vector(ADDR_WIDTH-1 downto 0);	---	address lines
 			data	: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- data lines
-			input	: in	std_logic_vector(DATA_WIDTH-1 downto 0);	--- input port
-			output	: out	std_logic_vector(DATA_WIDTH-1 downto 0)		--- output port
+			io_port	: inout	std_logic_vector(DATA_WIDTH-1 downto 0)		--- input/output port
 		);
 end entity LMC;
 
@@ -66,232 +66,265 @@ architecture rtl of LMC is
 	------------------------------------------------------------
 	--- registers
 	------------------------------------------------------------
-	signal acc	: std_logic_vector (DATA_WIDTH-1 downto 0);		--- accumlator
-	signal pc	: std_logic_vector (ADDR_WIDTH-1 downto 0);		--- program counter
+	signal acc	: std_logic_vector (DATA_WIDTH-1 downto 0);		--- accumulator
+	signal pc	: std_logic_vector (DATA_WIDTH-1 downto 0);		--- program counter
 
 	------------------------------------------------------------
 	--- internal buffers
 	------------------------------------------------------------
-	signal int_wr		: std_logic;
-	signal int_as		: std_logic;
 	signal int_clock	: std_logic;
-	signal int_addr		: std_logic_vector (ADDR_WIDTH-1 downto 0);
-	
+	signal bus_clock	: std_logic;
+	signal alu_clock	: std_logic;
+	signal io_clock		: std_logic;
+		
 	------------------------------------------------------------
 	--- internal registers/buffers/wires
 	------------------------------------------------------------
+	signal alu_add		: std_logic;
+	signal alu_sub		: std_logic;
 	signal load			: std_logic;
 	signal store		: std_logic;
-	signal fault		: std_logic;
 	signal fetch		: std_logic;
+	signal branch		: std_logic;
+	signal io_load		: std_logic;
+	signal io_store		: std_logic;
+
 	signal execute		: std_logic;
 	signal state		: std_logic_vector (1 downto 0);
 	signal next_state	: std_logic_vector (1 downto 0);
 	signal ireg			: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal oreg			: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal next_addr	: std_logic_vector (ADDR_WIDTH-1 downto 0);
-	signal const_1		: std_logic := '1';
-	signal const_0		: std_logic := '0';
 
 begin
-	------------------------------------------------------------
-	--- handle the reset
-	------------------------------------------------------------
-	acc <= (others => '0') when reset = '1' else (others => 'Z');
-	pc  <= (others => '0') when reset = '1' else (others => 'Z');
-
-	------------------------------------------------------------
-	--- pull down code.
-	------------------------------------------------------------
-	wr	<= RW_READ when int_wr = 'Z' else 'Z';
-	as	<= '1' when int_as = '1' else '0';
-	address <= int_addr when int_as = '1' else (others => '0');
-
 	------------------------------------------------------------
 	--- handle the clocking of the processor
 	------------------------------------------------------------
 	int_clock <= '1' when (enable = '1' and reset = '0' and clock = '1') else '0';
-
-	process (int_clock,pc)
+	
+	process (int_clock,reset)
 	begin
 		if (reset = '1')
 		then
-			state	<= SM_IFETCH;
-			pc		<= (others => '0');
-
-		elsif (fault = '0' and int_clock'event and int_clock = '1')
+			state		<= SM_RESET;
+			execute <= '0';
+			fetch 	<= '0';
+			
+		elsif (int_clock'event and int_clock = '1')
 		then
 			case state is
+				when SM_RESET		=>	fetch		<= '0';
+										pc			<= (others => '0');
+										execute		<= '0';
+										state		<= SM_IFETCH;
+
 				when SM_IFETCH		=>	fetch		<= '1';
 										execute		<= '0';
-										next_state	<= SM_OFETCH;
+										state		<= SM_OFETCH;
 
-				when SM_OFETCH		=>	fetch		<= '1';
+				when SM_OFETCH		=>	fetch 		<= '1';
+										pc			<= next_addr;
 										execute		<= '0';
-										next_state	<= SM_EXECUTE;
+										state		<= SM_EXECUTE;
 			
 				when SM_EXECUTE		=>	fetch		<= '0';
+										pc			<= next_addr;
 										execute		<= '1';
-										next_state	<= SM_IFETCH;
+										state		<= SM_IFETCH;
 
-				when others			=>	fetch		<= '0';   
-                                        execute		<= '1';
-			        					next_state	<= SM_IFETCH;
+				when others			=>	fetch		<= '0';
+                                        execute		<= '0';
+			        					state		<= SM_IFETCH;
 			end case;
 
-			state <= next_state;
 		end if;
 	end process;
 
 	------------------------------------------------------------
-	--- Execute the instruction
+	--- bus controller
 	------------------------------------------------------------
-	next_addr <= increment(pc);
+	--- handle rising edge
+	bus_clock <= '1' when (int_clock = '1' and (load = '1' or store = '1'  or fetch = '1')) else '0';
 
-	process (execute, pc)
+	process (load, fetch, store, bus_clock)
 	begin
-		if (execute = '1')
+		if (reset = '1')
 		then
-			case oreg is
-				when OP_HLT	=>	fault	<= '1';		--- cheat
-				when OP_ADD	=>	acc 	<= Add_Sub(acc,ireg,const_1);
-								pc		<= next_addr;				
+			ireg <= (others => '0');
+
+		elsif (load = '0' and store = '0' and fetch = '0')
+		then
+			as 		<= '0';
+			address <= (others => 'Z');
+
+		elsif (bus_clock'event and bus_clock = '1')
+		then
+			if (load = '1')
+			then
+				as		<= '1';
+				address	<= oreg;
+
+			elsif (fetch = '1')
+			then
+				as		<= '1';
+				address	<= pc;
+				ireg	<= oreg;
+
+			elsif (store = '1')
+			then
+				as		<= '1';
+				address	<= oreg;
+			end if;
+		end if;
+	end process;
+
+	--- handle falling edge
+	process (reset, load, store, fetch, bus_clock)
+	begin
+		
+		if (reset = '1')
+		then
+			oreg <= (others => '0');
+
+		elsif (load = '0' and store = '0' and fetch = '0')
+		then
+			wr		<= RW_READ;
+			data	<= (others => 'Z');
+
+		elsif (bus_clock'event and bus_clock = '0')
+		then
+			if (fetch = '1')
+			then
+				oreg	<= data;
+				
+			elsif (store = '1')
+			then
+				wr		<= RW_WRITE;
+				data	<= acc;
+			end if;
+		end if;
+	end process;
+
+	------------------------------------------------------------
+	--- IO bus driver
+	------------------------------------------------------------
+	io_clock <= '1' when int_clock = '1' and (io_load = '1' or io_store = '1') else '0';
 	
-				when OP_SUB	=>	acc 	<= Add_Sub(acc,ireg,const_0); 
-								pc		<= next_addr;
-				
-				when OP_STA	=>	store	<= '1';
-								pc		<= next_addr;
-				
-				when OP_LDA	=>	load 	<= '1';
-								pc		<= next_addr;
-				
-				when OP_BRA	=>	pc 		<= oreg;
-				
-				when OP_BRZ	=>	if (acc = ZEROS)
-								then
-									pc <= oreg;
-								else
-									pc <= next_addr;
-								end if;
-				
-				when OP_BRP	=>	if (acc(DATA_WIDTH-1) = '0')
-								then
-									pc <= oreg;
-								else
-									pc <= next_addr;
-								end if;
-				
-				when OP_INP	=>	acc 	<= input; 
-								ips 	<= '1';
-								pc		<= next_addr;
-				
-				when OP_OUT	=>	output 	<= acc; 
-								ops 	<= '1';
-								pc		<= next_addr;
+	process (io_load, io_store,io_clock)
+	begin
+		if (io_load = '0' and io_store = '0')
+		then
+			io_port <= (others => 'Z');
+			
+		elsif (io_clock'event and io_clock = '1')
+		then
+			if (io_store = '1')
+			then
+				io_port <= acc;
+			end if;
+		end if;
+	end process;
+
+	--- handle setting the io_wr strobe
+	process (io_store, io_clock)
+	begin
+		if (io_store = '0')
+		then
+			io_wr <= '0';
+
+		elsif (io_clock'event and io_clock = '0')
+		then
+			io_wr <= '1';
+		end if;
+	end process;
+
+	------------------------------------------------------------
+	--- ALU
+	------------------------------------------------------------
+	alu_clock <= '1' when (int_clock = '1' and (alu_add = '1' or alu_sub = '1' or load = '1' or io_load = '1')) else '0';
+
+	process (reset, alu_clock, alu_add, alu_sub, load)
+	begin
+		if (reset = '1')
+		then
+			acc <= (others => '0');
+
+		elsif (alu_clock'event and alu_clock = '0')
+		then
+			if (alu_add = '1')
+			then
+				acc <= acc + oreg;
+
+			elsif (alu_sub = '1')
+			then
+				acc <= acc - oreg;
+
+			elsif (load = '1')
+			then
+				acc <= data;
+			
+			elsif (io_load = '1')
+			then
+				acc <= io_port;
+			end if;
+		end if;
+	end process;
+	
+	------------------------------------------------------------
+	--- Program Counter Control (next_addr is loaded into PC)
+	------------------------------------------------------------
+	process (reset, int_clock)
+	begin
+		if (reset = '1')
+		then
+			next_addr <= (others => '0');
+
+		elsif (int_clock'event and int_clock = '0')
+		then
+			if (branch = '1')
+			then
+				next_addr <= oreg;
+			else
+				next_addr <= pc + 1;		--- no branch
+			end if;
+		end if;
+	end process;
+
+	------------------------------------------------------------
+	--- Instruction Decoder
+	------------------------------------------------------------
+	process (reset,execute,oreg,ireg,next_addr,acc)
+	begin
+		if (reset = '1' or execute = '0')
+		then
+			store		<= '0';
+			load 		<= '0';
+			alu_add		<= '0';
+			alu_sub		<= '0';
+			branch 		<= '0';
+			io_load 	<= '0';
+			io_store	<= '0';
+
+		elsif (execute = '1')
+		then
+			case ireg is
+				when OP_HLT	=>	null;
+				when OP_ADD	=>	alu_add		<= '1';
+				when OP_SUB	=>	alu_sub		<= '1';
+				when OP_STA	=>	store		<= '1';
+				when OP_LDA	=>	load		<= '1';
+				when OP_BRA	=>	branch		<= '1';
+				when OP_BRZ	=>	if (acc = ZEROS) then branch <= '1'; end if;
+				when OP_BRP	=>	if (acc /= ZEROS) then branch <= '1'; end if;
+				when OP_INP	=>	io_load		<= '1';
+				when OP_OUT	=>	io_store	<= '1';
 -- nop for now	when OP_INT	=> 	
 -- nop for now	when OP_IRT	=> 
-				when others	=> fault <= '1';
+				when others	=>	null;
 			end case;
-		else
-			ips <= '0';
-			ops <= '0';
-			load  <= '0';
-			store <= '0';
-
-		end if;
-	end process;
-
-	------------------------------------------------------------
-	--- fetch logic
-	--- This will rotate the old oreg into the ireg.
-	--- This will save some code and allow for easy clocking.
-	------------------------------------------------------------
-	process (fetch, int_clock)
-	begin
-		if (fetch = '0')
-		then
-			--- float all the lines 
-			wr		<= 'Z';
-			int_as	<= 'Z';
-			int_addr <= (others => 'Z');
-			data <= (others => 'Z');
-
-		elsif (fetch'event and fetch = '1')
-		then
-			ireg	<= oreg;
-			int_as	<= '1';
-			wr 		<= RW_READ;
-			int_addr <= pc;
-
-		elsif (int_clock'event and int_clock = '0')
-		then
-			--- latch the data
-			int_as <= '0';
-			wr <= RW_READ;
-			oreg <= data;
-
-		end if;
-	end process;
-
-	------------------------------------------------------------
-	--- Load logic
-	------------------------------------------------------------
-	process (load, int_clock)
-	begin
-		if (load = '0')
-		then
-			--- float all the lines 
-			wr <= 'Z';
-			int_as <= 'Z';
-			int_addr <= (others => 'Z');
-			data <= (others => 'Z');
-
-		elsif (load'event and load = '1')
-		then
-			int_as <= '1';
-			wr <= RW_READ;
-			int_addr <= oreg;
-
-		elsif (int_clock'event and int_clock = '0')
-		then
-			--- latch the data
-			int_as <= '0';
-			wr <= RW_READ;
-			acc <= data;
-
-		end if;
-	end process;
-
-	------------------------------------------------------------
-	--- Store logic
-	------------------------------------------------------------
-	process (store, int_clock)
-	begin
-		if (store = '0')
-		then
-			--- float all the lines 
-			wr <= 'Z';
-			int_as <= 'Z';
-			int_addr <= (others => 'Z');
-			data <= (others => 'Z');
-
-		elsif (store'event and store = '1')
-		then
-			int_as	<= '1';
-			wr	<= RW_READ;		--- while the int_address is being set up make sure we don't write
-			int_addr <= oreg;
-			data <= acc;
-
-		elsif (int_clock'event and int_clock = '0')
-		then
-			int_as	<= '1';
-			wr  <= RW_WRITE;	--- set the data latch
-
 		end if;
 	end process;
 
 end architecture rtl;
 
 --- vi:nocin:sw=4 ts=4:fdm=marker
-

@@ -49,9 +49,10 @@ package definitions is
 	------------------------------------------------------------
 	--- State Machine
 	------------------------------------------------------------
-	constant	SM_IFETCH	:	std_logic_vector(1 downto 0)	:= "00";	--- fetch instruction byte 1
-	constant	SM_OFETCH	:	std_logic_vector(1 downto 0)	:= "01";	--- fetch instruction byte 1
-	constant	SM_EXECUTE	:	std_logic_vector(1 downto 0)	:= "10";	--- execute the instruction
+	constant	SM_RESET	:	std_logic_vector(1 downto 0)	:= "00";	--- reset
+	constant	SM_IFETCH	:	std_logic_vector(1 downto 0)	:= "01";	--- fetch instruction byte 1
+	constant	SM_OFETCH	:	std_logic_vector(1 downto 0)	:= "10";	--- fetch instruction byte 1
+	constant	SM_EXECUTE	:	std_logic_vector(1 downto 0)	:= "11";	--- execute the instruction
 
 	------------------------------------------------------------
 	--- Opcodes
@@ -140,4 +141,3 @@ package body definitions is
 end definitions;
 
 --- vi:nocin:sw=4 ts=4:fdm=marker
-
