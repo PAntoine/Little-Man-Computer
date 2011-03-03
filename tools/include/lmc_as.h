@@ -7,7 +7,7 @@
  *     
  *        This does slight deviate from the LMC as specified on Wikipedia as it is
  *        HEX (makes it easier for me to code) and the size of the mailboxes are
- *        defined buy the users.
+ *        defined by the users.
  *
  *        Also, will need to be able to handle exceptions and interrupts.
  *
@@ -27,12 +27,14 @@
  *         0x06		Bra	(branch conditional)
  *         0x07		Brz (branch if zero)
  *         0x08		Brp	(branch if positive)
- *         0x08		INP	(input from input port)
+ *         0x09		INP	(input from input port)
  *         0x0a		OUT (outputto output port)
  *		
  *		   Non-standard operand:
  *		   0x0b		INT (interrupt)
  *		   0x0c		IRT (return from interrupt)
+ *         0x0d		DRD (device read)
+ *         0x0e		DWR (device write)
  *
  *		   Registers:
  *
@@ -42,8 +44,6 @@
  *
  *		   (non-standard register)
  *		   IVECTOR = interrupt vector.
- *
- * 
  *
  * auth:  Peter Antoine  
  * date:  16/02/11

@@ -55,7 +55,7 @@ entity LMC is
 			as		: out	std_logic;									--- address strobe
 			io		: out	std_logic;									--- IO port enable
 			address	: out	std_logic_vector(ADDR_WIDTH-1 downto 0);	---	address lines
-			data	: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- data lines
+			data	: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- int_data lines
 			io_port	: inout	std_logic_vector(DATA_WIDTH-1 downto 0)		--- input/output port
 		);
 end entity LMC;
@@ -89,7 +89,6 @@ architecture rtl of LMC is
 
 	signal execute		: std_logic;
 	signal state		: std_logic_vector (1 downto 0);
-	signal next_state	: std_logic_vector (1 downto 0);
 	signal ireg			: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal oreg			: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal next_addr	: std_logic_vector (ADDR_WIDTH-1 downto 0);
@@ -104,7 +103,7 @@ begin
 	begin
 		if (reset = '1')
 		then
-			state		<= SM_RESET;
+			state	<= SM_RESET;
 			execute <= '0';
 			fetch 	<= '0';
 			
@@ -112,11 +111,12 @@ begin
 		then
 			case state is
 				when SM_RESET		=>	fetch		<= '0';
-										pc			<= (others => '0');
+										pc			<= (others => '1');
 										execute		<= '0';
 										state		<= SM_IFETCH;
 
 				when SM_IFETCH		=>	fetch		<= '1';
+										pc			<= next_addr;
 										execute		<= '0';
 										state		<= SM_OFETCH;
 
@@ -126,7 +126,6 @@ begin
 										state		<= SM_EXECUTE;
 			
 				when SM_EXECUTE		=>	fetch		<= '0';
-										pc			<= next_addr;
 										execute		<= '1';
 										state		<= SM_IFETCH;
 
@@ -141,69 +140,42 @@ begin
 	------------------------------------------------------------
 	--- bus controller
 	------------------------------------------------------------
-	--- handle rising edge
 	bus_clock <= '1' when (int_clock = '1' and (load = '1' or store = '1'  or fetch = '1' or io_load = '1' or io_store = '1')) else '0';
 	
-	io <= '1' when (io_store = '1' or io_load = '1') else '0';
+	wr <= RW_WRITE	when (store = '1' and bus_clock = '0') else RW_READ;
+	io <= '1' 		when (io_store = '1' or io_load = '1') else '0';
+	as <= '1'		when (load = '1' or store = '1'  or fetch = '1' or io_load = '1' or io_store = '1') else '0';
 
-	process (load, fetch, store, bus_clock)
+	data 	<= acc	when (store = '1' and reset = '0') else (others => 'Z');
+	io_port <= acc	when (io_store = '1' and reset = '0') else (others => 'Z');	
+
+	address <=	pc		when (fetch = '1') else
+				oreg	when (load = '1' or store = '1' or io_load = '1' or io_store = '1') else
+				(others => 'Z');
+
+	process (load, fetch, store, bus_clock,reset)
 	begin
 		if (reset = '1')
 		then
-			ireg <= (others => '0');
+			ireg	<= (others => '0');
 
-		elsif (load = '0' and store = '0' and fetch = '0')
+		elsif (fetch = '1' and bus_clock'event and bus_clock = '1')
 		then
-			as 		<= '0';
-			address <= (others => 'Z');
+			ireg	<= oreg;
 
-		elsif (bus_clock'event and bus_clock = '1')
-		then
-		if (load = '1' or store = '1' or io_load = '1' or io_store = '1')
-			then
-				as		<= '1';
-				address	<= oreg;
-
-			elsif (fetch = '1')
-			then
-				as		<= '1';
-				address	<= pc;
-				ireg	<= oreg;
-
-			end if;
 		end if;
 	end process;
 
-	--- handle falling edge
-	process (reset, load, store, fetch, bus_clock)
+	process (reset, load, store, fetch, bus_clock, io_store)
 	begin
-		
 		if (reset = '1')
 		then
 			oreg <= (others => '0');
 
-		elsif (load = '0' and store = '0' and fetch = '0' and io_store = '1')
+		elsif (fetch = '1' and bus_clock'event and bus_clock = '0')
 		then
-			wr		<= RW_READ;
-			data	<= (others => 'Z');
-			io_port <= (others => 'Z');
+			oreg <= data;
 
-		elsif (bus_clock'event and bus_clock = '0')
-		then
-			if (fetch = '1')
-			then
-				oreg	<= data;
-				
-			elsif (store = '1')
-			then
-				wr		<= RW_WRITE;
-				data	<= acc;
-
-			elsif (io_store = '1')
-			then
-				io_port <= acc;
-
-			end if;
 		end if;
 	end process;
 
@@ -293,6 +265,7 @@ begin
 			end case;
 		end if;
 	end process;
+
 
 end architecture rtl;
 

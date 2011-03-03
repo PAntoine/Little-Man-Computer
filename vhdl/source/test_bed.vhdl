@@ -42,23 +42,30 @@ architecture rtl of LMC_TB is
 	component ROM
 		port (
 				sel			: in 	std_logic;						--- select
-				address		: in	std_logic_vector(7 downto 0);	--- address to read
+				address		: in	std_logic_vector(5 downto 0);	--- address to read
 				data		: out	std_logic_vector(7 downto 0)	--- data
 		);
 	end component ROM;
 
+	component RAM is
+		port (
+				sel			: in 	std_logic;						--- select
+				rw			: in	std_logic;						--- rw line
+				address		: in	std_logic_vector(7 downto 0);	--- address to read
+				data		: inout	std_logic_vector(7 downto 0)	--- data
+			);
+	end component RAM;
+
 	component LMC
-		port (	reset	: in	std_logic;									--- resets the processor
-				clock	: in	std_logic;									--- the system clock
-				enable	: in	std_logic;									--- enables the processor
-				wr		: out	std_logic;									--- read/write line
-				as		: out	std_logic;									--- address strobe
-				ips		: out	std_logic;									--- input latched
-				ops		: out	std_logic;									--- output latched
-				address	: out	std_logic_vector(ADDR_WIDTH-1 downto 0);	---	address lines
-				data	: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- data lines
-				input	: in	std_logic_vector(DATA_WIDTH-1 downto 0);	--- input port
-				output	: out	std_logic_vector(DATA_WIDTH-1 downto 0)		--- output port
+		port (	reset		: in	std_logic;									--- resets the processor
+				clock		: in	std_logic;									--- the system clock
+				enable		: in	std_logic;									--- enables the processor
+				wr			: out	std_logic;									--- read/write line
+				as			: out	std_logic;									--- address strobe
+				io			: out	std_logic;									--- IO port enable
+				address		: out	std_logic_vector(ADDR_WIDTH-1 downto 0);	---	address lines
+				data		: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- data lines
+				io_port		: inout	std_logic_vector(DATA_WIDTH-1 downto 0)		--- input/output port
 		);
 	end component LMC;
 
@@ -67,14 +74,16 @@ architecture rtl of LMC_TB is
 	------------------------------------------------------------
 
 	signal clock	: std_logic := '0';
-	signal reset	: std_logic;
-	signal enable	: std_logic;
+	signal reset	: std_logic := '0';
+	signal enable	: std_logic	:= '0';
+	signal io_wire	: std_logic;
 	signal as_wire	: std_logic;
 	signal rw_wire	: std_logic;
 	signal rom_sel	: std_logic;
+	signal ram_sel	: std_logic;
 	signal addr_bus	: std_logic_vector (ADDR_WIDTH-1 downto 0);
 	signal data_bus	: std_logic_vector (DATA_WIDTH-1 downto 0);
-	signal input	: std_logic_vector (DATA_WIDTH-1 downto 0);
+	signal io_bus	: std_logic_vector (DATA_WIDTH-1 downto 0) := "00001111";
 
 begin
 
@@ -82,16 +91,18 @@ begin
 	enable <= '1' after 5 ns;
 	reset  <= '1', '0' after 4 ns;
 
-	input <= (others => '0');
+	io_bus <= "00001111";
 
 	--- clock
 	clock <= not clock after 5 ns;	
 	
 	--- blocks to be tested
-	rom_sel <= '1' when (as_wire = '1' and rw_wire = RW_READ) else '0';
+	rom_sel <= '1' when (as_wire = '1' and rw_wire = RW_READ and io_wire = '1') else '0';
+	ram_sel <= '1' when (as_wire = '1' and io_wire = '0') else '0';
 
-	rc: ROM port map (sel => as_wire, address => addr_bus, data => data_bus);
-	lc: LMC port map (reset => reset, enable => enable, clock => clock, wr => rw_wire, as => as_wire, address => addr_bus, data => data_bus, input => input);
+	rm: RAM port map (sel => ram_sel, rw => rw_wire, address => addr_bus, data => data_bus);
+	rc: ROM port map (sel => rom_sel, address => addr_bus(5 downto 0), data => data_bus);
+	lc: LMC port map (reset => reset, enable => enable, clock => clock, wr => rw_wire, as => as_wire, io => io_wire, address => addr_bus, data => data_bus, io_port => io_bus);
 
 end architecture rtl;
 

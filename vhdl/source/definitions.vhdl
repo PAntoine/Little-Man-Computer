@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
----                                                           definitions package
+---                                                          definitions package
 ---                                                    LMC (Little Man Computer)
 --------------------------------------------------------------------------------
 --- Name:	defintions.vhdl
@@ -44,6 +44,8 @@ package definitions is
 	constant	ADDR_WIDTH	: natural := 8;
 	constant	DATA_WIDTH	: natural := 8;
 
+	constant	NUM_DEVICES	: natural := 8;
+
 	constant	ZEROS		: std_logic_vector(DATA_WIDTH-1 downto 0)	:= (others => '0');
 
 	------------------------------------------------------------
@@ -69,6 +71,13 @@ package definitions is
 	constant	OP_OUT	:	std_logic_vector(7 downto 0) := "00001001";
 	constant	OP_INT	:	std_logic_vector(7 downto 0) := "00001010";
 	constant	OP_IRT	:	std_logic_vector(7 downto 0) := "00001011";
+
+	------------------------------------------------------------
+	--- DEVICE LAYOUTS - Addresses
+	------------------------------------------------------------
+	constant	ROM_DEVICE	: natural := 0;
+
+	constant	DEVICE_ROM_ADDRESS	:	std_logic_vector(7 downto 0) := "00000001";
 
     ----------------------------------------------------
     --- functions

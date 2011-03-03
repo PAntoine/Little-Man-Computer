@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 entity rom is
 	port (
 			sel			: in 	std_logic;						--- select
-			address		: in	std_logic_vector(7 downto 0);	--- address to read
+			address		: in	std_logic_vector(5 downto 0);	--- address to read
 			data		: out	std_logic_vector(7 downto 0)	--- data
 		);
 end entity;
@@ -68,16 +68,6 @@ architecture rtl of rom is
 );
 begin
 	
-	process (sel,address)
-	begin
-		if (sel = '0')
-		then
-			data <= (others => 'Z');
-
-		elsif (sel = '1')
-		then
-			data <= memory(to_integer(unsigned(address)));
-		end if;
-	end process;
-
+	data <= memory(to_integer(unsigned(address))) when sel = '1' else (others => 'Z');
+	
 end architecture rtl;
