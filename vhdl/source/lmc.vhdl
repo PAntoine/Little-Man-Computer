@@ -144,13 +144,13 @@ begin
 	
 	wr <= RW_WRITE	when (store = '1' and bus_clock = '0') else RW_READ;
 	io <= '1' 		when (io_store = '1' or io_load = '1') else '0';
-	as <= '1'		when (load = '1' or store = '1'  or fetch = '1' or io_load = '1' or io_store = '1') else '0';
+	as <= '1'		when (load = '1' or store = '1'  or fetch = '1' or io_load = '1' or io_store = '1' or alu_add = '1' or alu_sub = '1') else '0';
 
 	data 	<= acc	when (store = '1' and reset = '0') else (others => 'Z');
 	io_port <= acc	when (io_store = '1' and reset = '0') else (others => 'Z');	
 
 	address <=	pc		when (fetch = '1') else
-				oreg	when (load = '1' or store = '1' or io_load = '1' or io_store = '1') else
+				oreg	when (load = '1' or store = '1' or io_load = '1' or io_store = '1' or alu_add = '1' or alu_sub = '1') else
 				(others => 'Z');
 
 	process (load, fetch, store, bus_clock,reset)
@@ -194,11 +194,11 @@ begin
 		then
 			if (alu_add = '1')
 			then
-				acc <= acc + oreg;
+				acc <= acc + data;
 
 			elsif (alu_sub = '1')
 			then
-				acc <= acc - oreg;
+				acc <= acc - data;
 
 			elsif (load = '1')
 			then
@@ -256,7 +256,7 @@ begin
 				when OP_LDA	=>	load		<= '1';
 				when OP_BRA	=>	branch		<= '1';
 				when OP_BRZ	=>	if (acc = ZEROS) then branch <= '1'; end if;
-				when OP_BRP	=>	if (acc /= ZEROS) then branch <= '1'; end if;
+				when OP_BRP	=>	if (acc(7) /= '1') then branch <= '1'; end if;
 				when OP_INP	=>	io_load		<= '1';
 				when OP_OUT	=>	io_store	<= '1';
 -- nop for now	when OP_INT	=> 	
