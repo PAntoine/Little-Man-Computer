@@ -256,7 +256,7 @@ begin
 				when OP_LDA	=>	load		<= '1';
 				when OP_BRA	=>	branch		<= '1';
 				when OP_BRZ	=>	if (acc = ZEROS) then branch <= '1'; end if;
-				when OP_BRP	=>	if (acc(7) /= '1') then branch <= '1'; end if;
+				when OP_BRP	=>	if (acc(7) /= '1') then branch <= '1'; end if;		--- HACK: need to add a status register and handle this properly.
 				when OP_INP	=>	io_load		<= '1';
 				when OP_OUT	=>	io_store	<= '1';
 -- nop for now	when OP_INT	=> 	

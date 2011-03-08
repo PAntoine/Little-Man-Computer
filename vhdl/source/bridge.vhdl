@@ -6,12 +6,11 @@
 --- Desc:
 ---       Little Man Computer
 ---		
----		This block is the device controller bridge block.
----		It will handle the IO connection between the LMC processor and the
----		devices on the bus.
+---		This block defines the bridge chip 
+---
 ---
 --- Errors:
----		<none>
+---       None.
 ---
 --- Dependencies:
 ---       None.
@@ -34,74 +33,109 @@ use ieee.std_logic_unsigned.all;
 use work.definitions.all;
 
 entity BRIDGE is
-	port (	enable		: in	std_logic;									--- enable the bridge chip
-			reset		: in	std_logic;									--- reset the state of the bridge
-			rw			: in	std_logic;									--- read/write
-			address		: in	std_logic_vector(ADDR_WIDTH-1 downto 0);	--- address
-			data		: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- data
-
-			--- Device bus
-			dev_as		: out	std_logic;									--- device address strobe
-			dev_sel		: out	std_logic_vector(NUM_DEVICES-1 downto 0);	--- device select lines
-			dev_addr	: out	std_logic_vector(ADDR_WIDTH-1 downto 0);	--- device address lines
-			dev_data	: inout	std_logic_vector(DATA_WIDTH-1 downto 0)		--- device data lines
-	);
-end entity BRIDGE;
-
-architecture rtl of BRIDGE is
-
-	component ROM_CONTROLLER is
-		port (	enable		: in	std_logic;									--- enable the rom controller
-				reset		: in	std_logic;									--- reset the rom controller
+		port (	reset		: in	std_logic;									--- reset the state of the bridge
+				clock		: in	std_logic;									--- system clock
 				rw			: in	std_logic;									--- read/write
+				io			: in	std_logic;									--- IO CPU lines
+				address		: in	std_logic_vector(ADDR_WIDTH-1 downto 0);	--- address
 				data		: inout	std_logic_vector(DATA_WIDTH-1 downto 0);	--- data
 
 				--- Device bus
 				dev_as		: out	std_logic;									--- device address strobe
-				dev_sel		: out	std_logic;									--- device select line
+				dev_sel		: out	std_logic_vector(NUM_DEVICES-1 downto 0);	--- device select lines
 				dev_addr	: out	std_logic_vector(ADDR_WIDTH-1 downto 0);	--- device address lines
-				dev_data	: in	std_logic_vector(DATA_WIDTH-1 downto 0)		--- device data lines
+				dev_data	: inout	std_logic_vector(DATA_WIDTH-1 downto 0)		--- device data lines
 		);
-	end component ROM_CONTROLLER;
+end entity BRIDGE;
 
+architecture rtl of BRIDGE is
 
-	signal int_dev_sel	:	std_logic_vector(NUM_DEVICES-1 downto 0);
+	------------------------------------------------------------
+	--- wires
+	------------------------------------------------------------
+	signal int_dev_sel	: std_logic_vector (NUM_DEVICES-1 downto 0);			--- internal device select
+	
+	signal rom_data 	: std_logic_vector (DATA_WIDTH-1 downto 0);
+	signal rom_addr		: std_logic_vector (ADDR_WIDTH-1 downto 0);
+	signal next_addr	: std_logic_vector (ADDR_WIDTH-1 downto 0);
 
-    ----------------------------------------------------
-    --- Internal Wiring of the devices
-    ----------------------------------------------------
-	constant	INT_DEVICE_SEL_ROM :	std_logic_vector(7 downto 0) := "00000001";
-
-	constant	INT_ROM_CONTROLLER :	natural := 0;
+	signal rom_addr_clock : std_logic;
 
 begin
 
-	------------------------------------------------------------
-	--- Address decode
-	------------------------------------------------------------
-	process (enable, address)
-	begin
-		if ( enable = '0')
-		then
-			int_dev_sel <= (others => '0');
+	int_dev_sel <=	RAM_SELECT when (io = '0') else
+					IOP_SELECT when (io & address) = DEVICE_IOP_ADDRESS else
+					ROM_SELECT when (io & address) = DEVICE_ROM_ADDRESS else
+					ZEROS;
 
-		else
-			case address is
-				when DEVICE_ROM_ADDRESS =>	int_dev_sel	<= INT_DEVICE_SEL_ROM;
-				when others				=>	int_dev_sel	<= (others => '0');
-			end case;
+	------------------------------------------------------------
+	--- ROM Controller
+	--- When the device is written to use this as the address
+	--- to read the contents from. If reading then pass the
+	--- rom data to the CPU bus, when increment the ROM addr.
+	------------------------------------------------------------
+	rom_addr_clock <= '1' when (int_dev_sel(ROM_DEVICE) = '1' and io = '1' and clock = '1') else '0';
+	
+	process (reset, rom_addr_clock)
+	begin
+		if (reset = '1')
+		then
+			next_addr <= (others => '0');
+		
+		elsif (rom_addr_clock'event and rom_addr_clock = '0')
+		then
+			if (rw = RW_WRITE)
+			then
+				next_addr <= data;
+			else
+				next_addr <= rom_addr + 1;
+			end if;
 		end if;
 	end process;
 
-	------------------------------------------------------------
-	--- Device Mapping
-	--- Each device must float the bus when it's select line
-	--- is low.
-	------------------------------------------------------------
-	romc : ROM_CONTROLLER port map (reset => reset, enable => int_dev_sel(INT_ROM_CONTROLLER), rw => rw, data => data, dev_as => dev_as, dev_sel => dev_sel(ROM_DEVICE), dev_addr => dev_addr, dev_data => dev_data);
+	--- change the address when the rom is unselected
+	process (reset, int_dev_sel(ROM_DEVICE))
+	begin
+		if (reset = '1')
+		then
+			rom_addr <= (others => '0');
+			rom_data <= (others => '0');
 
+		elsif (int_dev_sel(ROM_DEVICE)'event and int_dev_sel(ROM_DEVICE) = '0')
+		then
+			rom_data <= dev_data;
+			rom_addr <= next_addr;
+		end if;
+	end process;
+
+	--- mux the rom output to the CPU bus during a read
+	data <= rom_data when (int_dev_sel(ROM_DEVICE) = '1' and rw = RW_READ) else (others => 'Z');
+	data <= (others => 'Z') when (int_dev_sel(RAM_DEVICE) = '1');
+
+	------------------------------------------------------------
+	--- bus control
+	------------------------------------------------------------
+	process (int_dev_sel)
+	begin
+		case int_dev_sel is
+			when RAM_SELECT	=>	dev_as 		<= '0';
+								dev_sel		<= int_dev_sel;
+								dev_addr	<= (others => '0');
+
+			when IOP_SELECT	=>	dev_as 		<= '0';
+								dev_sel		<= int_dev_sel;
+								dev_addr	<= (others => '0');
+
+			when ROM_SELECT	=>	dev_as 		<= '1';
+								dev_sel		<= int_dev_sel;
+								dev_addr	<= rom_addr;
+
+			when others => 		dev_as		<= '0';
+								dev_sel		<= (others => '0');
+								dev_addr	<= (others => '0');
+		end case;
+	end process;
 
 end architecture rtl;
 
 --- vi:nocin:sw=4 ts=4:fdm=marker
-

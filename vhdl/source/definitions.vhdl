@@ -75,9 +75,15 @@ package definitions is
 	------------------------------------------------------------
 	--- DEVICE LAYOUTS - Addresses
 	------------------------------------------------------------
-	constant	ROM_DEVICE	: natural := 0;
+	constant	RAM_DEVICE	: natural := 0;
+	constant	ROM_DEVICE	: natural := 1;
 
-	constant	DEVICE_ROM_ADDRESS	:	std_logic_vector(7 downto 0) := "00000001";
+	constant	RAM_SELECT	: std_logic_vector(7 downto 0) := "00000001";
+	constant	IOP_SELECT	: std_logic_vector(7 downto 0) := "00000010";
+	constant	ROM_SELECT	: std_logic_vector(7 downto 0) := "00000100";
+
+	constant	DEVICE_IOP_ADDRESS	:	std_logic_vector(8 downto 0) := "100000000";
+	constant	DEVICE_ROM_ADDRESS	:	std_logic_vector(8 downto 0) := "100000001";
 
     ----------------------------------------------------
     --- functions
