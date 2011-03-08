@@ -111,8 +111,8 @@ begin
 	--- blocks to be tested
 	bd: BRIDGE port map (reset => reset, clock => clock, rw => rw_wire, io => io_wire, address => addr_bus, dev_sel => dev_sel, data => data_bus, dev_data => io_bus);
 
-	rm: RAM port map (sel => dev_sel(0), rw => rw_wire, address => addr_bus, data => data_bus);
-	rc: ROM port map (sel => dev_sel(1), address => addr_bus(5 downto 0), data => data_bus);
+	rm: RAM port map (sel => dev_sel(RAM_DEVICE), rw => rw_wire, address => addr_bus(7 downto 0), data => data_bus);
+	rc: ROM port map (sel => dev_sel(ROM_DEVICE), address => addr_bus(5 downto 0), data => data_bus);
 
 	lc: LMC port map (reset => reset, enable => enable, clock => clock, wr => rw_wire, as => as_wire, io => io_wire, address => addr_bus, data => data_bus, io_port => io_bus);
 

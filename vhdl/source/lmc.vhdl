@@ -66,7 +66,7 @@ architecture rtl of LMC is
 	--- registers
 	------------------------------------------------------------
 	signal acc	: std_logic_vector (DATA_WIDTH-1 downto 0);		--- accumulator
-	signal pc	: std_logic_vector (DATA_WIDTH-1 downto 0);		--- program counter
+	signal pc	: std_logic_vector (ADDR_WIDTH-1 downto 0);		--- program counter
 
 	------------------------------------------------------------
 	--- internal buffers
@@ -74,30 +74,63 @@ architecture rtl of LMC is
 	signal int_clock	: std_logic;
 	signal bus_clock	: std_logic;
 	signal alu_clock	: std_logic;
-		
+
+	attribute clock_signal : string;
+	attribute clock_signal of int_clock : signal is "yes";
+	attribute clock_signal of bus_clock : signal is "yes";
+	attribute clock_signal of alu_clock : signal is "yes";
+
 	------------------------------------------------------------
 	--- internal registers/buffers/wires
 	------------------------------------------------------------
-	signal alu_add		: std_logic;
-	signal alu_sub		: std_logic;
-	signal load			: std_logic;
-	signal store		: std_logic;
-	signal fetch		: std_logic;
-	signal branch		: std_logic;
-	signal io_load		: std_logic;
-	signal io_store		: std_logic;
-
 	signal execute		: std_logic;
+	signal fetch 		: std_logic;
 	signal state		: std_logic_vector (1 downto 0);
 	signal ireg			: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal oreg			: std_logic_vector (DATA_WIDTH-1 downto 0);
 	signal next_addr	: std_logic_vector (ADDR_WIDTH-1 downto 0);
 
+	------------------------------------------------------------
+	--- internal control bus
+	--- alu switches on the alu
+	--- req controls loading the registers
+	--- mem controls mmory read writes
+	--- bra for branch instructions
+	--- ioc  for io calls.
+	--- lht for processor halted
+	---
+	--- details:
+	--- alu: 00 = sub, 01 = add
+	--- req: 00 = long_jump
+	--- mem: 00 = read, 01 = write, 10 = long read, 11 = long_write
+	--- bra: 00 = short, 01 = long
+	------------------------------------------------------------
+	signal control_bus	: std_logic_vector (7 downto 0);
+
+	alias	alu	: std_logic is control_bus(2);
+	alias	reg	: std_logic is control_bus(3);
+	alias	mem	: std_logic is control_bus(4);
+	alias	bra	: std_logic is control_bus(5);
+	alias	ioc	: std_logic is control_bus(6);
+	alias	hlt	: std_logic is control_bus(7);
+
+	alias	lng : std_logic is control_bus(1);
+	alias	dir : std_logic is control_bus(0);
+
+	alias	details		: std_logic_vector(1 downto 0) is control_bus(1 downto 0);
+
+	------------------------------------------------------------
+	--- Long Jump Register
+	------------------------------------------------------------
+	signal long_jump_reg	: std_logic_vector (7 downto 0);
+	signal high				: std_logic_vector (7 downto 0);		--- wire for the long jump register
+
 begin
+
 	------------------------------------------------------------
 	--- handle the clocking of the processor
 	------------------------------------------------------------
-	int_clock <= '1' when (enable = '1' and reset = '0' and clock = '1') else '0';
+	int_clock <= '1' when (enable = '1' and reset = '0' and clock = '1' and hlt = '0') else '0';
 	
 	process (int_clock,reset)
 	begin
@@ -129,9 +162,7 @@ begin
 										execute		<= '1';
 										state		<= SM_IFETCH;
 
-				when others			=>	fetch		<= '0';
-                                        execute		<= '0';
-			        					state		<= SM_IFETCH;
+				when others			=>	null;
 			end case;
 
 		end if;
@@ -140,20 +171,22 @@ begin
 	------------------------------------------------------------
 	--- bus controller
 	------------------------------------------------------------
-	bus_clock <= '1' when (int_clock = '1' and (load = '1' or store = '1'  or fetch = '1' or io_load = '1' or io_store = '1')) else '0';
+	bus_clock <= '1' when (int_clock = '1' and (mem = '1' or ioc = '1' or fetch = '1' or alu = '1')) else '0';
 	
-	wr <= RW_WRITE	when (store = '1' and bus_clock = '0') else RW_READ;
-	io <= '1' 		when (io_store = '1' or io_load = '1') else '0';
-	as <= '1'		when (load = '1' or store = '1'  or fetch = '1' or io_load = '1' or io_store = '1' or alu_add = '1' or alu_sub = '1') else '0';
+	wr <= RW_WRITE	when ((ioc = '1' or mem = '1') and dir = DIR_STORE and bus_clock = '0') else RW_READ;
+	io <= '1' 		when (ioc = '1') else '0';
+	as <= '1'		when (mem = '1' or ioc = '1' or fetch = '1' or alu = '1') else '0';
 
-	data 	<= acc	when (store = '1' and reset = '0') else (others => 'Z');
-	io_port <= acc	when (io_store = '1' and reset = '0') else (others => 'Z');	
+	data 	<= acc	when ((mem = '1' or ioc = '1') and dir = DIR_STORE and reset = '0') else (others => 'Z');
+	io_port <= acc	when (ioc = '1' and dir = DIR_STORE and reset = '0') else (others => 'Z');	
 
-	address <=	pc		when (fetch = '1') else
-				oreg	when (load = '1' or store = '1' or io_load = '1' or io_store = '1' or alu_add = '1' or alu_sub = '1') else
+	high 	<= long_jump_reg when lng = '1' else (others => '0');
+
+	address <=	pc				when (fetch = '1') else
+				(high & oreg)	when (mem = '1' or ioc = '1' or alu = '1') else
 				(others => 'Z');
 
-	process (load, fetch, store, bus_clock,reset)
+	process (fetch,bus_clock,reset)
 	begin
 		if (reset = '1')
 		then
@@ -166,7 +199,7 @@ begin
 		end if;
 	end process;
 
-	process (reset, load, store, fetch, bus_clock, io_store)
+	process (reset, fetch, bus_clock)
 	begin
 		if (reset = '1')
 		then
@@ -182,9 +215,9 @@ begin
 	------------------------------------------------------------
 	--- ALU
 	------------------------------------------------------------
-	alu_clock <= '1' when (int_clock = '1' and (alu_add = '1' or alu_sub = '1' or load = '1' or io_load = '1')) else '0';
+	alu_clock <= '1' when (int_clock = '1' and (alu = '1' or (dir = DIR_LOAD and (mem = '1' or ioc = '1')))) else '0';
 
-	process (reset, alu_clock, alu_add, alu_sub, load)
+	process (reset, alu_clock, alu, mem, ioc)
 	begin
 		if (reset = '1')
 		then
@@ -192,25 +225,28 @@ begin
 
 		elsif (alu_clock'event and alu_clock = '0')
 		then
-			if (alu_add = '1')
+			if (alu = '1')
 			then
-				acc <= acc + data;
+				case details is
+					when "00" => acc <= acc + data;
+					when "01" => acc <= acc - data;
+					when "10" => acc <= acc(6 downto 0) & '0';
+					when "11" => acc <= '0' & acc (7 downto 1);
+					when others => null;
+				end case;
 
-			elsif (alu_sub = '1')
-			then
-				acc <= acc - data;
-
-			elsif (load = '1')
+			elsif (mem = '1')
 			then
 				acc <= data;
-			
-			elsif (io_load = '1')
+
+			elsif (ioc = '1')
 			then
 				acc <= io_port;
+
 			end if;
 		end if;
 	end process;
-	
+
 	------------------------------------------------------------
 	--- Program Counter Control (next_addr is loaded into PC)
 	------------------------------------------------------------
@@ -222,9 +258,9 @@ begin
 
 		elsif (int_clock'event and int_clock = '0')
 		then
-			if (branch = '1')
+			if (bra = '1')
 			then
-				next_addr <= oreg;
+				next_addr <= high & oreg;
 			else
 				next_addr <= pc + 1;		--- no branch
 			end if;
@@ -234,34 +270,27 @@ begin
 	------------------------------------------------------------
 	--- Instruction Decoder
 	------------------------------------------------------------
-	process (reset,execute,oreg,ireg,next_addr,acc)
+	process (reset,execute,ireg,acc)
 	begin
 		if (reset = '1' or execute = '0')
 		then
-			store		<= '0';
-			load 		<= '0';
-			alu_add		<= '0';
-			alu_sub		<= '0';
-			branch 		<= '0';
-			io_load 	<= '0';
-			io_store	<= '0';
+			control_bus <= (others => '0');
 
-		elsif (execute = '1')
-		then
+		else
 			case ireg is
-				when OP_HLT	=>	null;
-				when OP_ADD	=>	alu_add		<= '1';
-				when OP_SUB	=>	alu_sub		<= '1';
-				when OP_STA	=>	store		<= '1';
-				when OP_LDA	=>	load		<= '1';
-				when OP_BRA	=>	branch		<= '1';
-				when OP_BRZ	=>	if (acc = ZEROS) then branch <= '1'; end if;
-				when OP_BRP	=>	if (acc(7) /= '1') then branch <= '1'; end if;		--- HACK: need to add a status register and handle this properly.
-				when OP_INP	=>	io_load		<= '1';
-				when OP_OUT	=>	io_store	<= '1';
+				when OP_ADD	=>	control_bus <= ALU_COMMAND & ALU_ADD;
+				when OP_SUB	=>	control_bus <= ALU_COMMAND & ALU_SUB;
+				when OP_LDA	=>	control_bus <= MEM_COMMAND & SIZE_SHORT & DIR_LOAD;
+				when OP_STA	=>	control_bus	<= MEM_COMMAND & SIZE_SHORT & DIR_STORE;
+				when OP_BRA	=>	control_bus <= BRA_COMMAND & SIZE_SHORT & '0';
+				when OP_BRZ	=>	if (acc = ZEROS) then control_bus <= BRA_COMMAND & SIZE_SHORT & '0'; else control_bus <= (others => '0'); end if;
+				when OP_BRP	=>	if (acc(7) /= '1') then control_bus <= BRA_COMMAND & SIZE_SHORT & '0'; else control_bus <= (others => '0'); end if;		--- HACK: need to add a status register and handle this properly.
+				when OP_INP	=>	control_bus	<= IOC_COMMAND & SIZE_SHORT & DIR_LOAD;
+				when OP_OUT	=>	control_bus	<= IOC_COMMAND & SIZE_SHORT & DIR_STORE;
 -- nop for now	when OP_INT	=> 	
 -- nop for now	when OP_IRT	=> 
-				when others	=>	null;
+				when OP_HLT	=>	control_bus <= HLT_COMMAND & "00";
+				when others	=>	control_bus <= (others => '0');
 			end case;
 		end if;
 	end process;

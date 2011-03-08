@@ -41,7 +41,7 @@ package definitions is
 	constant	RW_READ		: std_logic := '0';
 	constant	RW_WRITE	: std_logic := '1';
 	
-	constant	ADDR_WIDTH	: natural := 8;
+	constant	ADDR_WIDTH	: natural := 16;
 	constant	DATA_WIDTH	: natural := 8;
 
 	constant	NUM_DEVICES	: natural := 8;
@@ -71,12 +71,14 @@ package definitions is
 	constant	OP_OUT	:	std_logic_vector(7 downto 0) := "00001001";
 	constant	OP_INT	:	std_logic_vector(7 downto 0) := "00001010";
 	constant	OP_IRT	:	std_logic_vector(7 downto 0) := "00001011";
+	constant	OP_LRG	:	std_logic_vector(7 downto 0) := "00001100";
 
 	------------------------------------------------------------
 	--- DEVICE LAYOUTS - Addresses
 	------------------------------------------------------------
 	constant	RAM_DEVICE	: natural := 0;
-	constant	ROM_DEVICE	: natural := 1;
+	constant	IOP_DEVICE	: natural := 1;
+	constant	ROM_DEVICE	: natural := 2;
 
 	constant	RAM_SELECT	: std_logic_vector(7 downto 0) := "00000001";
 	constant	IOP_SELECT	: std_logic_vector(7 downto 0) := "00000010";
@@ -84,6 +86,27 @@ package definitions is
 
 	constant	DEVICE_IOP_ADDRESS	:	std_logic_vector(8 downto 0) := "100000000";
 	constant	DEVICE_ROM_ADDRESS	:	std_logic_vector(8 downto 0) := "100000001";
+    
+	----------------------------------------------------
+    --- Control Bus Values
+    ----------------------------------------------------
+	constant SIZE_SHORT	:	std_logic := '0';
+	constant SIZE_LONG	:	std_logic := '1';
+
+	constant DIR_LOAD	:	std_logic := RW_READ;
+	constant DIR_STORE	:	std_logic := RW_WRITE;
+
+	constant ALU_COMMAND :  std_logic_vector (5 downto 0) := "000001";
+	constant REG_COMMAND :  std_logic_vector (5 downto 0) := "000010";
+	constant MEM_COMMAND :  std_logic_vector (5 downto 0) := "000100";
+	constant BRA_COMMAND :  std_logic_vector (5 downto 0) := "001000";
+	constant IOC_COMMAND :  std_logic_vector (5 downto 0) := "010000";
+	constant HLT_COMMAND :  std_logic_vector (5 downto 0) := "100000";
+
+	constant ALU_ADD	:	std_logic_vector(1 downto 0) := "00";
+	constant ALU_SUB	:	std_logic_vector(1 downto 0) := "01";
+	constant ALU_SHL	:	std_logic_vector(1 downto 0) := "10";
+	constant ALU_SHR	:	std_logic_vector(1 downto 0) := "11";
 
     ----------------------------------------------------
     --- functions
@@ -92,7 +115,6 @@ package definitions is
 	function Add_Sub (	signal  ain : std_logic_vector(DATA_WIDTH-1 downto 0);
 						signal  bin : std_logic_vector(DATA_WIDTH-1 downto 0);
 						signal 	add : std_logic								) return std_logic_vector;
-
 
 end package definitions;
 
