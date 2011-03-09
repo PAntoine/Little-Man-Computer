@@ -124,3 +124,4 @@ Peter Antoine.
 
 7th March 2011
 
+*designed is a bit of a strong work, it's very hacky.
