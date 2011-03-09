@@ -1,13 +1,20 @@
 /*-------------------------------------------------------------------------------------*
  *
  * name:  lmc_as.h
- * proj:  Miniweb browser version 3
  *
  * desc:  This file holds the definitions for the Little Man Computer compiler.
  *     
  *        This does slight deviate from the LMC as specified on Wikipedia as it is
  *        HEX (makes it easier for me to code) and the size of the mailboxes are
  *        defined by the users.
+ *
+ *        The memory organisation is a little weird. The standard Lda and Sta 
+ *        commands will only write to the bottom 256 bytes of memory. The same
+ *        with the br? commands. This simply a hack to be able to have a boot
+ *        loader running from ROM, so the page read/write (PLD and PST) functions
+ *        will be able to access a bigger memory space. Also, note that the PC
+ *        will handle the larder address space so that the bootload/bootstrap
+ *        code can run from ROM.
  *
  *        Also, will need to be able to handle exceptions and interrupts.
  *
@@ -23,18 +30,19 @@
  *         0x01		Add
  *         0x02		Sub
  *         0x03		Sta (store)
- *         0x05		Lda (load)
- *         0x06		Bra	(branch conditional)
- *         0x07		Brz (branch if zero)
- *         0x08		Brp	(branch if positive)
- *         0x09		INP	(input from input port)
- *         0x0a		OUT (outputto output port)
+ *         0x04		Lda (load)
+ *         0x05		Bra	(branch conditional)
+ *         0x06		Brz (branch if zero)
+ *         0x07		Brp	(branch if positive)
+ *         0x08		INP	(input from input port)
+ *         0x09		OUT (outputto output port)
  *		
  *		   Non-standard operand:
- *		   0x0b		INT (interrupt)
- *		   0x0c		IRT (return from interrupt)
- *         0x0d		DRD (device read)
- *         0x0e		DWR (device write)
+ *		   0x0a		INT (interrupt)
+ *		   0x0b		IRT (return from interrupt)
+ *		   0x0c		LPG	(load page register)
+ *		   0x0d		PLO	(page load)
+ *		   0x0e		PST	(page store)
  *
  *		   Registers:
  *
@@ -44,12 +52,15 @@
  *
  *		   (non-standard register)
  *		   IVECTOR = interrupt vector.
+ *		   PAGE_REG = 16 bit access register.
  *
  * auth:  Peter Antoine  
  * date:  16/02/11
  *
- *               Copyright (c) 2009 Miniweb Interactive.
- *                       All rights Reserved.
+ *-------------------------------------------------------------------------------------*
+ *                        Copyright (c) 2011 Peter Antoine.
+ *                       Released under the Artistic Licence.
+ *                             All rights Reserved.
  *-------------------------------------------------------------------------------------*/
 #ifndef  __LMC_AS_H__
 #define  __LMC_AS_H__
@@ -73,6 +84,9 @@ typedef enum
 	LMCOC_OUT,
 	LMCOC_INT,
 	LMCOC_IRT,
+	LMCOC_LPG,
+	LMCOC_PLO,
+	LMCOC_PST,
 	LMCOC_DAT,
 	LMCOC_MAX_OPCODES,
 	LMCOC_INVALID_OPCODE = LMCOC_MAX_OPCODES

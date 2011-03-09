@@ -71,7 +71,9 @@ package definitions is
 	constant	OP_OUT	:	std_logic_vector(7 downto 0) := "00001001";
 	constant	OP_INT	:	std_logic_vector(7 downto 0) := "00001010";
 	constant	OP_IRT	:	std_logic_vector(7 downto 0) := "00001011";
-	constant	OP_LRG	:	std_logic_vector(7 downto 0) := "00001100";
+	constant	OP_LLG	:	std_logic_vector(7 downto 0) := "00001100";
+	constant	OP_PLD	:	std_logic_vector(7 downto 0) := "00001101";
+	constant	OP_PST	:	std_logic_vector(7 downto 0) := "00001110";
 
 	------------------------------------------------------------
 	--- DEVICE LAYOUTS - Addresses

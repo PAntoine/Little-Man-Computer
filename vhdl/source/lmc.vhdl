@@ -101,7 +101,7 @@ architecture rtl of LMC is
 	---
 	--- details:
 	--- alu: 00 = sub, 01 = add
-	--- req: 00 = long_jump
+	--- req: 00 = page
 	--- mem: 00 = read, 01 = write, 10 = long read, 11 = long_write
 	--- bra: 00 = short, 01 = long
 	------------------------------------------------------------
@@ -122,8 +122,8 @@ architecture rtl of LMC is
 	------------------------------------------------------------
 	--- Long Jump Register
 	------------------------------------------------------------
-	signal long_jump_reg	: std_logic_vector (7 downto 0);
-	signal high				: std_logic_vector (7 downto 0);		--- wire for the long jump register
+	signal page_reg	: std_logic_vector (7 downto 0);
+	signal high		: std_logic_vector (7 downto 0);		--- wire for the long jump register
 
 begin
 
@@ -180,7 +180,7 @@ begin
 	data 	<= acc	when ((mem = '1' or ioc = '1') and dir = DIR_STORE and reset = '0') else (others => 'Z');
 	io_port <= acc	when (ioc = '1' and dir = DIR_STORE and reset = '0') else (others => 'Z');	
 
-	high 	<= long_jump_reg when lng = '1' else (others => '0');
+	high 	<= page_reg when lng = '1' else (others => '0');
 
 	address <=	pc				when (fetch = '1') else
 				(high & oreg)	when (mem = '1' or ioc = '1' or alu = '1') else
@@ -268,6 +268,26 @@ begin
 	end process;
 
 	------------------------------------------------------------
+	--- register loading
+	--- Load the registers on the falling edge.
+	------------------------------------------------------------
+	process (reset, reg, int_clock)
+	begin
+		if (reset = '1')
+		then
+			page_reg <= (others => '0');
+
+		elsif (int_clock'event and int_clock = '0')
+		then
+			if (reg = '1')
+			then
+				-- TODO extend this to other registers
+				page_reg <= data;
+			end if;
+		end if;
+	end process;
+
+	------------------------------------------------------------
 	--- Instruction Decoder
 	------------------------------------------------------------
 	process (reset,execute,ireg,acc)
@@ -287,8 +307,11 @@ begin
 				when OP_BRP	=>	if (acc(7) /= '1') then control_bus <= BRA_COMMAND & SIZE_SHORT & '0'; else control_bus <= (others => '0'); end if;		--- HACK: need to add a status register and handle this properly.
 				when OP_INP	=>	control_bus	<= IOC_COMMAND & SIZE_SHORT & DIR_LOAD;
 				when OP_OUT	=>	control_bus	<= IOC_COMMAND & SIZE_SHORT & DIR_STORE;
--- nop for now	when OP_INT	=> 	
--- nop for now	when OP_IRT	=> 
+				when OP_LLG =>	control_bus <= REG_COMMAND & SIZE_SHORT & DIR_LOAD;
+				when OP_PLD	=>	control_bus <= MEM_COMMAND & SIZE_LONG & DIR_LOAD;
+				when OP_PST	=>	control_bus	<= MEM_COMMAND & SIZE_LONG & DIR_STORE;
+				when OP_INT	=> 	control_bus <= (others => '0');			--- TEMP NOOP
+				when OP_IRT	=>	control_bus <= (others => '0');			--- TEMP NOOP
 				when OP_HLT	=>	control_bus <= HLT_COMMAND & "00";
 				when others	=>	control_bus <= (others => '0');
 			end case;

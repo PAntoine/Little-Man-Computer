@@ -33,10 +33,13 @@ char*	op_code_strings[] =
 				"OUT",
 				"INT",
 				"IRT",
+				"LPG",
+				"PLO",
+				"PST",
 				"DAT"
 };
 
-unsigned int op_code_size[] = {3,3,3,3,3,3,3,3,3,3,3,3,3,3};
+unsigned int op_code_size[] = {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
 
 LABEL	label[MAX_LABELS];
 unsigned int num_labels = 1;
@@ -94,18 +97,21 @@ unsigned int generate_binary (FILE* out_file, INSTRUCTION* program)
  *-------------------------------------------------------------------------------------*/
 unsigned int	semantic_check(INSTRUCTION* program)
 {
+	unsigned int	line_no = 0;
 	unsigned int	result = 1;
 	unsigned int	address = 0;
 	INSTRUCTION*	current_instruction = program;
 
 	while (current_instruction != NULL)
 	{
+		line_no++;
+
 		/* check for labels */
 		if(current_instruction->label != 0)
 		{
 			if (label[current_instruction->label].defined)
 			{
-				printf("ERROR: redefinition of a label\n");
+				printf("ERROR %03d: redefinition of a label\n",line_no);
 				result = 0;
 			}
 			else
@@ -123,7 +129,7 @@ unsigned int	semantic_check(INSTRUCTION* program)
 			case LMCOC_HALT:
 				if (current_instruction->operand != 0)
 				{
-					printf("ERROR: unexpected operand\n");
+					printf("ERROR %03d: unexpected operand\n",line_no);
 					result = 0;
 				}
 				
@@ -138,9 +144,13 @@ unsigned int	semantic_check(INSTRUCTION* program)
 			case LMCOC_LDA:
 			case LMCOC_SUB:
 			case LMCOC_ADD:
+			case LMCOC_LPG:
+			case LMCOC_PLO:
+			case LMCOC_PST:
+
 				if (current_instruction->operand == 0)
 				{
-					printf("ERROR: instruction expecting an operand\n");
+					printf("ERROR %03d: instruction expecting an operand\n",line_no);
 					result = 0;
 				}
 				
@@ -150,7 +160,7 @@ unsigned int	semantic_check(INSTRUCTION* program)
 			case LMCOC_DAT:
 				if (current_instruction->label == 0 || current_instruction->operand == 0)
 				{
-					printf("ERROR: DAT must have operand and a label\n");
+					printf("ERROR %03d: DAT must have operand and a label\n",line_no);
 					result = 0;
 				}
 				else
@@ -162,7 +172,7 @@ unsigned int	semantic_check(INSTRUCTION* program)
 				break;
 
 			default:
-				printf("ERROR: invalid instruction op_code: %02x\n",current_instruction->opcode);
+				printf("ERROR %03d: invalid instruction op_code: %02x\n",current_instruction->opcode,line_no);
 				result = 0;
 				break;
 		}
@@ -199,14 +209,14 @@ unsigned int find_opcode ( TOKEN* token )
  *  Description:  This function will find a label. It will ADD new labels that it
  *                does not find.
  *-------------------------------------------------------------------------------------*/
-unsigned int find_label ( TOKEN* token)
+unsigned int find_label (TOKEN* token,unsigned int line_no)
 {
 	unsigned int result = MAX_LABELS;
 	unsigned int search;
 
 	if (token->size > MAX_LABEL_SIZE)
 	{
-		printf("ERROR: token size too big\n");
+		printf("ERROR %03d: token size too big\n",line_no);
 	}
 	else
 	{
@@ -233,7 +243,7 @@ unsigned int find_label ( TOKEN* token)
 			}
 			else
 			{
-				printf("ERROR: too many labels specified\n");
+				printf("ERROR %03d: too many labels specified\n",line_no);
 			}
 		}
 	}
@@ -252,7 +262,7 @@ unsigned int find_label ( TOKEN* token)
  *
  *
  *-------------------------------------------------------------------------------------*/
-INSTRUCTION* parse_string ( char* buffer, unsigned int buffer_length, INSTRUCTION* instruction , unsigned int* failed)
+INSTRUCTION* parse_string ( char* buffer, unsigned int buffer_length, INSTRUCTION* instruction , unsigned int* failed, unsigned int line_no)
 {
 	unsigned int	size;
 	unsigned int	num_tokens = 0;
@@ -305,25 +315,25 @@ INSTRUCTION* parse_string ( char* buffer, unsigned int buffer_length, INSTRUCTIO
 		if (temp->opcode == LMCOC_INVALID_OPCODE)
 		{
 			/* ok, must be a label to start */
-			temp->label = find_label(&token[0]);
+			temp->label = find_label(&token[0],line_no);
 
 			if ((temp->opcode = find_opcode(&token[1])) != LMCOC_INVALID_OPCODE)
 			{
 				if (num_tokens == 3)
 				{
-					temp->operand = find_label(&token[2]);
+					temp->operand = find_label(&token[2],line_no);
 				}
 			}
 			else
 			{
-				printf("ERROR: invalid format for instruction\n");
+				printf("ERROR %03d: invalid format for instruction\n",line_no);
 				*failed = 1;
 			}
 		}
 		else
 		{
 			if (num_tokens >= 2)
-				temp->operand = find_label(&token[1]);
+				temp->operand = find_label(&token[1],line_no);
 		}
 
 		if (*failed == 0)
@@ -356,6 +366,7 @@ int	main(int argc, char* argv[])
 	unsigned int	input_size = 1024;
 	unsigned int	failed = 0;
 	unsigned int	start = 1;
+	unsigned int	line_count = 0;
 	INSTRUCTION		first = {0,0,0,NULL};
 	INSTRUCTION*	current_instruction;
 
@@ -423,11 +434,12 @@ int	main(int argc, char* argv[])
 		while (!feof(in_file) && current_instruction != NULL)
 		{
 			bytes_read = getline(&input_string,&input_size,in_file);
-			
+			line_count++;
+
 			if (bytes_read > 0)
 			{
 				INSTRUCTION* prev = current_instruction;
-				current_instruction = parse_string(input_string,bytes_read,current_instruction,&failed);
+				current_instruction = parse_string(input_string,bytes_read,current_instruction,&failed,line_count);
 			}
 		}
 
