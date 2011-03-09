@@ -1,15 +1,18 @@
 /*-------------------------------------------------------------------------------------*
  *
  * name:  lmc_as.c
- * proj:  Miniweb browser version 3
  *
  * desc:  This is the simple LMC compiler.
  *
  * auth:  Peter Antoine  
  * date:  16/02/11
  *
- *               Copyright (c) 2009 Miniweb Interactive.
- *                       All rights Reserved.
+ * auth:  Peter Antoine  
+ * date:  16/02/11
+ *-------------------------------------------------------------------------------------*
+ *                        Copyright (c) 2011 Peter Antoine.
+ *                       Released under the Artistic Licence.
+ *                             All rights Reserved.
  *-------------------------------------------------------------------------------------*/
 
 #include <stdio.h>
